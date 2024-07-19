@@ -7,16 +7,15 @@ After=postfix.service
 After=exim4.service
 After=nss-lookup.target
 Wants=network-online.target
-
-[Service]
-Type=exec
-Restart=on-error
-
 # Don't start without a config file
 #
 # Config file must cantain "set daemon <n>" so fetchmail is
 # daemonized
 ConditionPathExists=/etc/fetchmail.d/%i.conf
+
+[Service]
+Type=exec
+Restart=on-failure
 
 # User info. Change as appropriate
 User=vmail
