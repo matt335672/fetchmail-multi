@@ -1,0 +1,35 @@
+[Unit]
+Description=Fetchmail daemon for %I
+After=network-online.target
+After=remote-fs.target
+After=mail-transport-agent.target
+After=postfix.service
+After=exim4.service
+After=nss-lookup.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+Restart=on-error
+
+# Don't start without a config file
+#
+# Config file must cantain "set daemon <n>" so fetchmail is
+# daemonized
+ConditionPathExists=/etc/fetchmail.d/%i.conf
+
+# User info. Change as appropriate
+User=vmail
+Group=vmail
+
+# Use KillMode=process, so any started MDA finishes normally
+KillMode=process
+
+PIDFile=/run/fetchmail/%i/fetchmail.pid
+RuntimeDirectory=fetchmail/%i
+# Use a separate FETCHMAILHOME, so this fetchmail can run concurrently with others
+Environment="FETCHMAILHOME=/run/fetchmail/%i"
+ExecStart=/usr/bin/fetchmail -f /etc/fetchmail.d/%i.conf --pidfile /run/fetchmail/%i/fetchmail.pid --syslog
+
+[Install]
+WantedBy=multi-user.target
